@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- React 관련 라이브러리 -->
+    <!-- React의 핵심적인 코드 -->
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <!-- React 코드를 웹에 붙여주는 역할 -->
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="root"></div>
+    <!-- 결과 -->
+    <script>
+        const e = React.createElement;
+        class LikeButton extends React.Component {
+
+            constructor(props) {
+                    super(props);
+                    this.state = {
+                        liked: false,
+                    };
+                }
+                // 버튼을 만들겠다.
+            render() {
+                // type, property, textNode
+                return e('button', {
+                    onClick: () => {
+                        this.setState({
+                            liked: true
+                        });
+                        console.log('clicked');
+                    },
+                    type: 'submit'
+                }, this.state.liked === true ? 'Liked' : 'Like'); // <button type="submit" onclick="onclick">Like</button>
+            }
+        }
+    </script>
+    <script>
+        // 만든 버튼을 그린다.
+        // 실제 화면에 렌더링을 해주는 역할(DOM)
+        ReactDOM.render(e(LikeButton), document.querySelector('#root'));
+    </script>
+</body>
+
+</html>
