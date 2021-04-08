@@ -10,13 +10,16 @@
     <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
     <!-- React 코드를 웹에 붙여주는 역할 -->
     <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <title>Document</title>
 </head>
 
 <body>
     <div id="root"></div>
     <!-- 결과 -->
-    <script>
+    <!-- JavaScript 내부에서 실험적으로 html을 사용할 수 있도록 한다. -->
+    <script type="text/babel">
         const e = React.createElement;
         class LikeButton extends React.Component {
 
@@ -29,22 +32,18 @@
                 // 버튼을 만들겠다.
             render() {
                 // type, property, textNode
-                return e('button', {
-                    onClick: () => {
-                        this.setState({
-                            liked: true
-                        });
-                        console.log('clicked');
-                    },
-                    type: 'submit'
-                }, this.state.liked === true ? 'Liked' : 'Like'); // <button type="submit" onclick="onclick">Like</button>
+                // JS에서 html을 쓰는 것은 문법상 맞지 않다.
+                // 따라서 babel을 사용해야 한다. (최신문법, 실험적인 문법을 자바스크립트에서 쓸 수 있도록 도와준다)
+                return <button type="submit" onClick={() => { this.setState({ liked: true })}}>
+                    {this.state.liked ? 'Liked' : 'Like'}
+                </button>;
             }
         }
     </script>
-    <script>
+    <script type="text/babel">
         // 만든 버튼을 그린다.
         // 실제 화면에 렌더링을 해주는 역할(DOM)
-        ReactDOM.render(e(LikeButton), document.querySelector('#root'));
+        ReactDOM.render(<div><LikeButton /><LikeButton /><LikeButton /><LikeButton /></div>, document.querySelector('#root'));
     </script>
 </body>
 
