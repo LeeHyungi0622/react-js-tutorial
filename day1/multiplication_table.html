@@ -20,7 +20,7 @@
     <!-- 결과 -->
     <!-- JavaScript 내부에서 실험적으로 html을 사용할 수 있도록 한다. -->
     <script type="text/babel">
-        class GuGuDan extends React.Component {
+        class MultiplicationTable extends React.Component {
             // 실무에서는 constructor 내부에서 state를 관리하지 않고 밖으로 빼서 관리한다.
             state = {
                 first: Math.ceil(Math.random()*9),
@@ -47,8 +47,9 @@
                                         first: Math.ceil(Math.random() * 9),
                                         second: Math.ceil(Math.random() * 9),
                                         value: '',    
-                                    }   ``
+                                    } 
                                 });
+                                this.input.focus();
                             } else {
                                 this.setState({
                                     result: '땡',
@@ -59,12 +60,17 @@
 
             onChange = (e) => this.setState({ value : e.target.value });
 
+            input;
+
+            onRefInput = (c) => { this.input = c; }
+            
             render(){
+                console.log('Rendering');
                 return (
                     <React.Fragment>
                         <div>{this.state.first} 곱하기 {this.state.second}는? </div>
                         <form onSubmit={this.onSubmit}>
-                            <input type="number" value={this.state.value} onChange={this.onChange}/>
+                            <input ref={this.onRefInput} type="number" value={this.state.value} onChange={this.onChange}/>
                             <button>입력!</button>
                         </form>
                         <div>{this.state.result}</div>
@@ -76,7 +82,7 @@
     <script type="text/babel">
         // 만든 버튼을 그린다.
         // 실제 화면에 렌더링을 해주는 역할(DOM)
-        ReactDOM.render(<div><GuGuDan /></div>, document.querySelector('#root'));
+        ReactDOM.render(<div><MultiplicationTable /></div>, document.querySelector('#root'));
     </script>
 </body>
 
