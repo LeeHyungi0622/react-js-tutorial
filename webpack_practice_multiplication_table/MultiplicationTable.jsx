@@ -1,14 +1,15 @@
 const React = require('react');
+const { useState, useRef } = React;
 
 // functional component
 // 함수형 컴포넌트는 setState나 ref를 사용하지 않는 경우에 사용을 했었다.
 // 그런데 함수형 컴포넌트에서도 setState와 ref를 사용한 상태관리를 할 수 있게 해주었다.
 const MultiplicationTable = () => {
-    const [first, setFirst] = React.useState(Math.ceil(Math.random() * 9));
-    const [second, setSecond] = React.useState(Math.ceil(Math.random() * 9))
-    const [value, setValue] = React.useState('');
-    const [result, setResult] = React.useState('');
-    const inputRef = React.useRef(null);
+    const [first, setFirst] = useState(Math.ceil(Math.random() * 9));
+    const [second, setSecond] = useState(Math.ceil(Math.random() * 9))
+    const [value, setValue] = useState('');
+    const [result, setResult] = useState('');
+    const inputRef = useRef(null);
 
     const onChangeInput = (e) => {
         setValue(e.target.value);
