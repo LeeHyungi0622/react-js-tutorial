@@ -1,52 +1,42 @@
 const React = require('react');
-const { Component } = React;
+const { useState, useRef } = require('react');
 
-class WordRelay extends Component {
-    state = {
-        word: '이현기',
-        value: '',
-        result: ''
-    };
 
-    onSubmitForm = (e) => {
+const WordRelay = () => {
+    const [word, setWord] = useState('이현기!!*');
+    const [value, setValue] = useState('');
+    const [result, setResult] = useState('');
+    const inputRef = useRef(null);
+
+    const onSubmitForm = (e) => {
         e.preventDefault();
-        if(this.state.word[this.state.word.length - 1] === this.state.value[0]){
-            this.setState({
-                result: '정답입니다',
-                word: this.state.value,
-                value: ''
-            });
-            this.input.focus();
+        if(word[word.length - 1] === value[0]){
+            setResult('정답입니다.');
+            setWord(value);
+            setValue('');
+            inputRef.current.focus();
         } else {
-            this.setState({
-                result: '틀렸습니다.',
-                value: '',
-            });
-            this.input.focus();
+            setResult('틀렸습니다.');
+            setValue('');
+            inputRef.current.focus();
         }
     };
 
-    onChangeInput = (e) => {
+    const onChangeInput = (e) => {
         this.setState({ value: e.target.value })
     };
 
-    input;
-
-    onRefInput = (c) => {
-        this.input = c;
-    };
-    render(){
-        return (
-            <>
-                <div>{this.state.word}</div>
-                <form onSubmit={this.onSubmitForm}>
-                    <input ref={this.onRefInput} value={this.state.value} onChange={this.onChangeInput} />
-                    <button>입력!!</button>
-                </form>
-                <div>{this.state.result}</div>
-            </>
-        )
-    }
+    return (
+        <>
+            <div>{word}</div>
+            <form onSubmit={onSubmitForm}>
+                <input ref={inputRef} value={value} onChange={onChangeInput} />
+                <button>입력!!</button>
+            </form>
+            <div>{result}</div>
+        </>
+    )
+    
 }
 
 module.exports = WordRelay;
