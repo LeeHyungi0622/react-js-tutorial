@@ -62,7 +62,7 @@ const RockScissorsPaper = () => {
         }, 2000)
     };
 
-    return {(
+    return (
         <>
             <div id="computer" style={{ background: `url(https://en.pimg.jp/023/182/267/1/23182267.jpg) ${imgCoord} 0` }} />
             <div>
@@ -73,7 +73,7 @@ const RockScissorsPaper = () => {
             <div>{result}</div>
             <div>현재 {score}점</div>
         </>
-    )}
+    )
 }
 
 export default RockScissorsPaper;
