@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback} from 'react';
 import Ball from './Ball';
 
 // 로또 당첨숫자 7개 뽑는 함수
@@ -15,85 +15,59 @@ function getWinNumber(){
     return [...winNumber, bonusNumber];
 }
 
-class Lotto extends Component {
-    state = {
-        // 미리 준비할 데이터를 준비해두고 천천히 하나의 데이터씩 보여주기
-        winNumbers: getWinNumber(), 
-        // winBalls에 숫자가 당첨숫자가 한 개씩 들어가면 rendering
-        winBalls: [],
-        bonus: null,
-        // 모든 공이 뽑아진 뒤에 한 번 더 뽑을지에 대한 버튼
-        redo: false,
-    };
 
-    timeouts = [];
+const LottoNumberGenerator = () => {
+    const lottoNumbers = useMemo(() => getWinNumber(), [winBalls]);
+    const [winNumbers, setWinNumbers] = useState(lottoNumbers);
+    // const [winNumbers, setWinNumbers] = useState(getWinNumber());
+    const [winBalls, setWinBalls] = useState([]);
+    const [bonus, setBonus] = useState(null);
+    const [redo, setRedo] = useState(false);
+    const timeouts = useRef([]);
+    
 
-    runTimeouts = () => {
-        const { winNumbers } = this.state;
+    const onClickRedo = useCallback(() => {
+        console.log(winNumbers);
+        console.log('onClickRedo');
+        setWinNumbers(getWinNumber());
+        setWinBalls([]);
+        setBonus(null);
+        setRedo(false);
+        timeouts.current = [];
+    }, [winNumbers]);
+
+    useEffect(() => {
+        console.log('useEffect');
         for(let i = 0; i < winNumbers.length - 1; i++) {
-        // winNumbers의 숫자를 winBalls에 하나씩 넣어주면, render함수가 실행되면서
-        // 화면에 순차적으로 그려주게 된다. 
-            this.timeouts[i] = setTimeout(() => {
-                this.setState((prevState) => {
-                    return {
-                        winBalls: [...prevState.winBalls, winNumbers[i]]
-                    };
-                }); 
-            }, (i + 1) * 1000);
-        }
-        this.timeouts[6] = setTimeout(() => {
-            this.setState({
-                bonus: winNumbers[6],
-                redo: true,
-            });
+            // winNumbers의 숫자를 winBalls에 하나씩 넣어주면, render함수가 실행되면서
+            // 화면에 순차적으로 그려주게 된다. 
+                timeouts.current[i] = setTimeout(() => {
+                    setWinBalls((prevBalls) => [...prevBalls, winNumbers[i]]); 
+                }, (i + 1) * 1000);
+            }
+        timeouts.current[6] = setTimeout(() => {
+            setBonus(winNumbers[6]);
+            setRedo(true);
         }, 7000);
-    };
+        return () => {
+            timeouts.current.forEach((v) => {
+                clearTimeout(v);
+            });
+        };
+    }, [timeouts.current]); // 빈 배열이면 componentDidMount와 동일
 
-    componentDidMount(){
-        this.runTimeouts();
-    }
+    return(
+        <>
+            <div>당첨 숫자</div>
+            <div id="resultWindow">
+                { winBalls.map((v) => <Ball key={v} number={v} />) }
+            </div>
+            <div>보너스!</div>
+            { bonus && <Ball number={ bonus } /> }
+            { redo && <button onClick={onClickRedo}>한 번 더!</button>}    
+        </>  
+    )
+};
 
-    componentDidUpdate(prevProps, prevState){
-        console.log('didUpdate');
-        // 어떤 것이 바뀌었는지 판단을 할 수 있다.
-        if(this.state.winBalls.length === 0){
-            this.runTimeouts();
-        }
-    }
 
-
-    componentWillUnmount(){
-        this.timeouts.forEach((v) => {
-            clearTimeout(v);
-        });
-    }
-
-    onClickRedo = () => {
-        // state 초기화
-        this.setState({
-            winNumbers: getWinNumber(), 
-            winBalls: [],
-            bonus: null,
-            redo: false,
-        });
-        this.timeouts = [];
-    };
-
-    render(){
-        const { winBalls, bonus, redo } = this.state;
-        return(
-            <>
-                <div>당첨 숫자</div>
-                <div id="resultWindow">
-                    { winBalls.map((v) => <Ball key={v} number={v} />) }
-                </div>
-                <div>보너스!</div>
-                { bonus && <Ball number={ bonus } /> }
-                { redo && <button onClick={this.onClickRedo}>한 번 더!</button>}    
-            </>  
-        )
-        
-    }
-}
-
-export default Lotto;
+export default LottoNumberGenerator;
