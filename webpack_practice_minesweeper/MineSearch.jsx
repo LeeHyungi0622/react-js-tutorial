@@ -1,4 +1,4 @@
-import React, { useReducer, createContext, useMemo } from 'react';
+import React, { useReducer, createContext, useMemo, useEffect } from 'react';
 import Table from './Table';
 import Form from './Form';
 
@@ -61,7 +61,7 @@ const initialState = {
     timer: 0,
     result: '',
     // 게임을 중단하기 위한 flag
-    halted: false,
+    halted: true,
     openedCount: 0,
 }
 
@@ -72,6 +72,7 @@ export const CLICK_MINE = 'CLICK_MINE';
 export const FLAG_CELL = 'FLAG_CELL';
 export const QUESTION_CELL = 'QUESTION_CELL';
 export const NORMALIZE_CELL = 'NORMALIZE_CELL';
+export const INCREMENT_TIMER = 'INCREMENT_TIMER';
 
 const reducer = (state, action) => {
     switch(action.type){
@@ -83,8 +84,10 @@ const reducer = (state, action) => {
                     cell: action.cell, 
                     mine: action.mine,
                 },
+                openedCount: 0,
                 tableData: plantMine(action.row, action.cell, action.mine),
                 halted: false,
+                timer: 0,
             }
         };
         case OPEN_CELL:{
@@ -185,10 +188,11 @@ const reducer = (state, action) => {
             // 지뢰가 없는 칸 만큼 셀을 열었다면 승리
             let halted = false;
             let result = '';
+            // 가로 * 세로 - 지뢰갯수 === 열은 셀의 갯수가 같으면 승리!
             if(state.data.row * state.data.cell - state.data.mine === state.openedCount + openedCount){
                 halted = true;
                 // 승리했다고 메시지 띄워주기
-                result = '승리하셨습니다';
+                result = `${state.timer}초만에 승리하셨습니다`;
             }
             return {
                 ...state,
@@ -251,6 +255,12 @@ const reducer = (state, action) => {
                 tableData,
             };
         }
+        case INCREMENT_TIMER:{
+            return {
+                ...state,
+                timer: state.timer + 1,
+            }
+        }
         default:
             return state;
     }
@@ -261,6 +271,21 @@ const MineSearch = () => {
     const {tableData, halted, timer, result} = state;
 
     const value = useMemo(() => ({ tableData, halted, dispatch }), [tableData, halted]);
+    
+
+    useEffect(() => {
+        let timer;
+        // 중단이 풀렸을때 (게임이 시작될때)
+        if(halted === false){
+            timer = setInterval(() => {
+                dispatch({ type: INCREMENT_TIMER });
+            }, 1000);
+        }
+        return () => {
+            clearInterval(timer);
+        }
+    },[halted]);
+    
     return(
         <TableContext.Provider value={ value }>
             <Form dispatch={dispatch}/>
