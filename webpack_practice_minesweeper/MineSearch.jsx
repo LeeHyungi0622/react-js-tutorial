@@ -62,6 +62,7 @@ const initialState = {
     result: '',
     // 게임을 중단하기 위한 flag
     halted: false,
+    openedCount: 0,
 }
 
 // action 이름을 상수로 선언
@@ -77,6 +78,11 @@ const reducer = (state, action) => {
         case START_GAME:{
             return {
                 ...state,
+                data: {
+                    row: action.row, 
+                    cell: action.cell, 
+                    mine: action.mine,
+                },
                 tableData: plantMine(action.row, action.cell, action.mine),
                 halted: false,
             }
@@ -92,6 +98,7 @@ const reducer = (state, action) => {
             });
             //  한 번 열었던 칸은 다시 열어보지 않도록 처리 (dynamic programming과 유사)
             const checked = [];
+            let openedCount = 0;
             const checkAround = (row, cell) => {
                 if([CODE.OPENED, CODE.FLAG_MINE, CODE.FLAG, CODE.QUESTION_MINE, CODE.QUESTION].includes(tableData[row][cell])){
                     // 이미 열린 칸이나 지뢰가 있는 칸은 한번에 열면 안되기 때문에 막아준다.
@@ -108,6 +115,8 @@ const reducer = (state, action) => {
                     // 검사하지 않은 셀의 경우 checked 배열에 row/cell 형태로 push를 해준다.
                     checked.push(row + '/' + cell);
                 }
+                // 셀이 하나씩 열릴때마다 1씩 count값 올려주기
+                openedCount += 1;
                 // 주변 지뢰갯수 구하기
                 let around = [];
                 // 윗 줄이 존재하는 경우
@@ -167,15 +176,26 @@ const reducer = (state, action) => {
                     }
                 } 
                 
-                
+
             };
 
             // 주변 셀 검사 함수를 이용해서 주변 셀 검사하기
             checkAround(action.row, action.cell);
-            
+            // 승리조건 체크하기
+            // 지뢰가 없는 칸 만큼 셀을 열었다면 승리
+            let halted = false;
+            let result = '';
+            if(state.data.row * state.data.cell - state.data.mine === state.openedCount + openedCount){
+                halted = true;
+                // 승리했다고 메시지 띄워주기
+                result = '승리하셨습니다';
+            }
             return {
                 ...state,
                 tableData,
+                openedCount: state.openedCount + openedCount,
+                halted,
+                result,
             };
         }
         case CLICK_MINE:{
