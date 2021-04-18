@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useCallback, memo, useMemo } from 'react';
 import { CODE, OPEN_CELL, TableContext, CLICK_MINE, FLAG_CELL, QUESTION_CELL, NORMALIZE_CELL } from './MineSearch';
 
 const getTdStyle = (code) => {
@@ -31,6 +31,7 @@ const getTdStyle = (code) => {
 };
 
 const getTdText = (code) => {
+    console.log('getTdText rendering');
     switch(code){
         case CODE.NORMAL:
             return '';
@@ -53,7 +54,7 @@ const getTdText = (code) => {
 
 // 마우스 이벤트 (오른쪽 클릭하면 깃발-물음표-정상상태로 변화)
 
-const Td = ({rowIndex, cellIndex}) => {
+const Td = memo(({rowIndex, cellIndex}) => {
     const { tableData, dispatch, halted } = useContext(TableContext);
     const onClickTd = useCallback(() => {
         // 게임 상태가 종료가 되었으면 아무런 클릭 이벤트도 처리하지 않는다.
@@ -102,13 +103,14 @@ const Td = ({rowIndex, cellIndex}) => {
                 return;
         }
     }, [tableData[rowIndex][cellIndex], halted]);
-    return (
-        <td
-        style={getTdStyle(tableData[rowIndex][cellIndex])}
-        onClick={onClickTd}
-        onContextMenu={onRightClickTd}
-        >{getTdText(tableData[rowIndex][cellIndex])}</td>
-    );
-};
+    console.log('td rendering');
+    return useMemo(() => (
+            <td
+            style={getTdStyle(tableData[rowIndex][cellIndex])}
+            onClick={onClickTd}
+            onContextMenu={onRightClickTd}
+            >{getTdText(tableData[rowIndex][cellIndex])}</td>
+    ), [tableData[rowIndex][cellIndex]]);
+});
 
 export default Td;
