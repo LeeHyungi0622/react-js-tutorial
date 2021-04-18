@@ -119,7 +119,10 @@ const reducer = (state, action) => {
                     checked.push(row + '/' + cell);
                 }
                 // 셀이 하나씩 열릴때마다 1씩 count값 올려주기
-                openedCount += 1;
+                // 클릭한 셀이 닫힌 칸인 경우
+                if(tableData[row][cell] === CODE.NORMAL){
+                    openedCount += 1;
+                }
                 // 주변 지뢰갯수 구하기
                 let around = [];
                 // 윗 줄이 존재하는 경우
